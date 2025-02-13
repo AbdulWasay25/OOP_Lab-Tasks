@@ -61,11 +61,6 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-    /*if (argc < 10) {
-        cout << "Insufficient arguments" << endl;
-        return 1;
-    }*/
-    
     int row1 = stoi(argv[1]), col1 = stoi(argv[2]);
     int row2 = stoi(argv[3]), col2 = stoi(argv[4]);
     
