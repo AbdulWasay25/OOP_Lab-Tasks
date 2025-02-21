@@ -1,126 +1,180 @@
 #include<iostream>
-
-using namespace std ;
-
+#include<vector>
+using namespace std;
 class Menu{
-	string name;
-	string type;
-	double price;
-	public:
-		Menu(string n , string t , double p) : name(n) , type(t) {
-		if(p<0){
+    string name;
+    string type;
+    int price;
+    public:
+    Menu(string n, string t, int p):name(n),type(t){
+        if(p<0){
             price=0;
-        }else{
-            price=p;}}
-        void display(){
-        	cout<<"Item Name : "<<name ;
-        	cout<<"Item Type : "<<type ;
-        	cout<<"Item Price : "<<price ;
-		}   
-		string getName(){
-			return name;
-		} 
-		string getType(){
-			return type;
-		}
-		double getPrice(){
-			return price;
-		}
-		double Totalprice(int quantity){
-			return quantity*price ;
-		}
+        }
+        else{
+            price=p;
+        }
+    };
+    void display(){
+        cout<<"\n Name : "<<name;
+        cout<<"\n Type : "<<type;
+        cout<<"\n Price : "<<price;
+    };
+    string getType(){
+        return type;
+    };
+    string getName(){
+        return name;
+    };
+    int getTotal(int num){
+        return num*price;
+    }
+    int getPrice(){
+        return price;
+    }
 };
 class CoffeeShop{
-	string name ;
-	Menu** menu ;
-	string* orders ;
-	int s1 ; int s2;int ordersize;
-	public:
-		CoffeeShop(string name , int s1 , int s2 , Menu* m[] ){
-			this->name=name ;
-			this->s1=s1; this->s2=s2 ;
-			ordersize=0 ;
-			menu = new Menu*[s1] ;
-			orders = new string[s2] ;
-			for(int i=0 ; i<s1 ; i++){
-				menu[i] = m[i] ; 
-			}
-		}
-		string addOrder(string dish){
-			for(int i=0 ; i<s1 ; i++){
-				if(menu[i]->getName()==dish){
-					if(ordersize<s2){
-						orders[ordersize++]=dish;}
-						return "Order Added" ;
-				}
-			}
-			return "Unavailable" ;
-		}
-		string fullfillorder(){
-			if(ordersize > 0) {
-            	string fulfilled = orders[0];
-            	for(int i = 1; i < ordersize; ++i) {
-                	orders[i-1] = orders[i];
-            		}
-            	--ordersize;
-            	return "The " + fulfilled + " is ready";
+    Menu** menu;
+    int menuCount;
+    int menuCapacity;
+    vector<string> order;
+    public:
+    CoffeeShop(int c):menuCount(0),menuCapacity(c){
+        menu=new Menu*[menuCapacity];
+    };
+    void addMenu(Menu* m){
+        if(menuCount<menuCapacity){
+            menu[menuCount]=m;
+            menuCount++;
+            cout<<"Menu Added Successfully"<<endl;
+        }else{
+            menuCapacity*=2;
+            Menu** temp=new Menu*[menuCapacity];
+            for (int i = 0; i < menuCount; i++)
+            {
+                temp[i]=menu[i];
+            }
+            delete[]menu;
+            menu=temp;
+            menu[menuCount]=m;
+            menuCount++;
+            cout<<"Menu Added Successfully"<<endl;
         }
-        return "All orders have been fulfilled";
-		}
-		string listorders(){
-			if(ordersize == 0) {
-            string emptyArray[1] = {""};
-            //return emptyArray;
+    };
+    void displayMenu(){
+        for (int i = 0; i < menuCount; i++)
+        {
+            menu[i]->display();
         }
-        return *orders;
-		}
-		double dueAmount(){
-			double total = 0.0;
-        	for(int i = 0; i < ordersize; ++i) {
-            	for(int j = 0; j < s1; ++j) {
-                	if(orders[i] == menu[j]->getName()) {
-                    	total += menu[j]->getPrice();
-                	}
-            	}
-        	}
-        	return total ;
-		}
-		string cheapestItem(){
-			double minPrice = menu[0]->getPrice();
-        	string cheapest = menu[0]->getName();
-        	for(int i = 1; i < s1; ++i) {
-            	if(menu[i]->getPrice() < minPrice) {
-                	minPrice = menu[i]->getPrice();
-                	cheapest = menu[i]->getName();
-           		}
-        	}
-        	return cheapest;
-		}
-		string drinksOnly(){
-			string drinks[s1];
-        	int count = 0;
-        	for(int i = 0; i < s1; ++i) {
-            	if(menu[i]->getType() == "Drink" && count < s1) {
-                	drinks[count++] = menu[i]->getName();
-            	}
-        	}
-        	return *drinks;
-		}
-		string foodOnly(){
-			string food[s1];
-        	int count = 0;
-        	for(int i = 0; i < s1; ++i) {
-            	if(menu[i]->getType() == "Food" && count < s1) {
-                	food[count++] = menu[i]->getName();
-            	}
-        	}
-        	return *food;
+    };
+    void addOrder(string n){
+        int flag=0;
+        for (int i = 0; i < menuCount; i++)
+        {
+            if (menu[i]->getName()==n)
+            {
+                order.push_back(n);
+                cout<<"\n Order Added Successfully";
+                flag=1;
+                return;
+            }
+        }
+        if (!flag)
+        {
+            cout<<"\n No such item found";
+        }
+    };
+    void fullFilledOrder(){
+        if (order.empty())
+        {
+            cout<<"\n All Order Has Been Full Filled ";
+        }else{
+            for (auto i = order.begin(); i != order.end(); ++i)
+            {
+                cout << "\n The Item : " << *i << " is ready ";
+            }
+        }
+        
+    };
+    void listOrder(){
+        if (order.empty())
+        {
+            cout<<"\n {}";
+        }else{
+            for (auto i = order.begin(); i != order.end(); ++i)
+            {
+                cout << "\n " << *i ;
+            }
+        }
+    };
+    int dueAmount(){
+        int total=0;
+        for (auto i = order.begin(); i != order.end(); ++i)
+        {
+            for (int j = 0; j < menuCount; j++)
+            {
+                if (menu[j]->getName()==*i)
+                {
+                    total+=menu[j]->getPrice();
+                }
+                
+            }
+            
+        }
+        return total;
     }
-		
+    void cheapestItem(){
+        int min=0;
+        for (int i = 0; i < menuCount; i++)
+        {
+            if (min<menu[i]->getPrice())
+            {
+                min=menu[i]->getPrice();
+            }
+        }
+        cout<<"\n Cheapest Item : "<<min;
+    }
+    void drinksOnly(){
+        for (int i = 0; i < menuCount; i++)
+        {
+            if (menu[i]->getType()=="drink")
+            {
+                menu[i]->display();
+            }
+        }
+    };
+    void foodOnly(){
+        for (int i = 0; i < menuCount; i++)
+        {
+            if (menu[i]->getType()=="food")
+            {
+                menu[i]->display();
+            }
+        }
+    };
 };
-
-int main(int argc , char* argv[]){
-	Menu m[4]= {{"Latte" , "Drink" , 250} , {"abc" , "Food" , 100} , {"xyz" , "Food" , 200} , {"def" , "Drink" , 150}};
-	CoffeeShop cafe(*(argv + 1) , stoi(*(argv + 2)) , stoi(*(argv + 2)) , &m);
-	return 0;
+int main(){
+    CoffeeShop cafe(5);
+    Menu m1("Coffee","drink",100);
+    Menu m2("Tea","drink",50);
+    Menu m3("Burger","food",200);
+    Menu m4("Pizza","food",300);
+    Menu m5("Cold Drink","drink",40);
+    cafe.addMenu(&m1);
+    cafe.addMenu(&m2);
+    cafe.addMenu(&m3);
+    cafe.addMenu(&m4);
+    cafe.addMenu(&m5);
+    cafe.displayMenu();
+    cafe.addOrder("Coffee");
+    cafe.addOrder("Tea");
+    cafe.addOrder("Burger");
+    cafe.addOrder("Pizza");
+    cafe.addOrder("Cold Drink");
+    cafe.fullFilledOrder();
+    cafe.listOrder();
+    cout<<"\n Due Amount : "<<cafe.dueAmount();
+    cafe.cheapestItem();
+    cafe.drinksOnly();
+    cafe.foodOnly();
+    return 0;
 }
