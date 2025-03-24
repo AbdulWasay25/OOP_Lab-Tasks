@@ -102,7 +102,7 @@ int main(){
     cust.deposit(acc, 200);
     cust.withdraw(acc, 500);
     teller.freezeAcc(acc);
-    cust.deposit(acc, 100); // Should not work
+    cust.deposit(acc, 100); 
     teller.unfreezeAcc(acc);
     mgr.adjustbalance(acc, 5000);
     
